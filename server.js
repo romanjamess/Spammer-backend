@@ -22,21 +22,41 @@ app.get("/messages", async (req, res) => {
 });
 
 // creating a new message
-app.post("/messages", async (req, res) => {
-  const { text } = req.body;
-  const { parentId } = req.body;
+app.post('/messages', async (req, res) => {
+  const { text, parentId } = req.body;
 
+  //checks if text is provided in request body, if not it returns an error response
   if (!text) {
-    return res.send({ success: false, error: "You must add a body to text" })
-  }
-
-  try {
-    const message = await prisma.message.create({
-      data: {
-        text,
-        parentId
-      }
+    return res.send({
+      success: false,
+      error: 'Text must be provided to create a message!',
     });
+  }
+  try {
+    let message;
+    if (parentId) {
+      //check if parent message exists
+      const parentMessage = await prisma.message.findUnique({
+        where: {
+          id: parentId,
+        },
+      });
+
+      //Adds children to a parent message,
+      message = await prisma.child.create({
+        data: {
+          text,
+          parentId,
+        },
+      });
+    } else {
+      message = await prisma.message.create({
+        data: {
+          text,
+        },
+      });
+    }
+
     res.send({ success: true, message });
   } catch (error) {
     res.send({ success: false, error: error.message });
