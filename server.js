@@ -24,6 +24,7 @@ app.get("/messages", async (req, res) => {
 // creating a new message
 app.post("/messages", async (req, res) => {
   const { text } = req.body;
+  const { parentId } = req.body;
 
   if (!text) {
     return res.send({ success: false, error: "You must add a body to text" })
@@ -33,6 +34,7 @@ app.post("/messages", async (req, res) => {
     const message = await prisma.message.create({
       data: {
         text,
+        parentId
       }
     });
     res.send({ success: true, message });

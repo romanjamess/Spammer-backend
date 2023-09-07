@@ -8,9 +8,11 @@ datasource db {
 }
 
 model Message {
-  id         String   @id @default(uuid())
-  created_at DateTime @default(now())
-  ParentId   String?
+  id         String    @id @default(uuid())
+  created_at DateTime  @default(now())
+  parentId   String?
   text       String
-  likes      Int      @default(0)
+  likes      Int       @default(0)
+  children   Message[] @relation("parentchild")
+  parent     Message?  @relation("parentchild", fields: [parentId], references: [id])
 }
