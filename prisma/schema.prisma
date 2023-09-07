@@ -5,11 +5,12 @@ generator client {
 datasource db {
   provider = "cockroachdb"
   url      = env("DATABASE_URL")
-
 }
 
-model  Messages {
-  id    String @id @default(uuid())
-  text  String
-  like  Int    @default(0)
+model Message {
+  id         String   @id @default(uuid())
+  created_at DateTime @default(now())
+  ParentId   String?
+  text       String
+  likes      Int      @default(0)
 }
