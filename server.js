@@ -32,24 +32,34 @@ app.post('/messages', async (req, res) => {
       error: 'Text must be provided to create a message!',
     });
   }
+
+
   try {
     let message;
     if (parentId) {
-      //check if parent message exists
+      // Check if parent message exists
       const parentMessage = await prisma.message.findUnique({
         where: {
           id: parentId,
         },
       });
 
-      //Adds children to a parent message,
-      message = await prisma.child.create({
+      if (!parentMessage) {
+        return res.send({
+          success: false,
+          error: 'Parent message not found!',
+        });
+      }
+
+      // Create a child message with the parentId
+      message = await prisma.message.create({
         data: {
           text,
           parentId,
         },
       });
     } else {
+      // Create a regular message without parentId
       message = await prisma.message.create({
         data: {
           text,
@@ -62,7 +72,6 @@ app.post('/messages', async (req, res) => {
     res.send({ success: false, error: error.message });
   }
 });
-
 //update a message
 app.put("/messages/:messageId", async (req, res) => {
   const { messageId } = req.params;
