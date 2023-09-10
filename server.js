@@ -17,7 +17,15 @@ app.get("/", (req, res) => {
 
 //getting all the messages
 app.get("/messages", async (req, res) => {
-  const message = await prisma.message.findMany();
+  const message = await prisma.message.findMany({
+    include: {
+      children: {
+        include: {
+          children: {}
+        }
+      }
+    }
+  });
   res.send({ success: true, message, });
 });
 
@@ -67,16 +75,29 @@ app.post('/messages', async (req, res) => {
       });
     }
 
+    if (parentId) {
+      await prisma.message.update({
+        where: {
+          id: parentId,
+        },
+        data: {
+          children: {
+            connect: { id: message.id },
+          },
+        },
+      });
+    }
+
     res.send({ success: true, message });
   } catch (error) {
     res.send({ success: false, error: error.message });
   }
 });
+
 //update a message
 app.put("/messages/:messageId", async (req, res) => {
   const { messageId } = req.params;
   const { text } = req.body;
-
 
   if (!text) {
     return res.send({ success: false, message: "you must have a text to update" })
