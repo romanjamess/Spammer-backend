@@ -8,7 +8,7 @@ const app = express();
 const PORT = 3000;
 
 app.use(express.json());
-app.use(cors());l
+app.use(cors());
 
 app.get("/", (req, res) => {
   res.send({ success: true, message: "Welcome to the Emoji Server" });
